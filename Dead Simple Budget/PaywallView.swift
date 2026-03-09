@@ -65,8 +65,8 @@ struct PaywallView: View {
                             }
                             .padding(14)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color(UIColor.tertiarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .background(DSBTheme.groupedBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard))
                         }
 
                         if let sub = manager.subscriptionProduct {
@@ -91,8 +91,8 @@ struct PaywallView: View {
                                         .fontWeight(.semibold)
                                 }
                                 .padding()
-                                .background(Color(UIColor.secondarySystemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .background(DSBTheme.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard))
                             }
                             .buttonStyle(.plain)
                             .foregroundStyle(.primary)
@@ -120,8 +120,8 @@ struct PaywallView: View {
                                         .fontWeight(.semibold)
                                 }
                                 .padding()
-                                .background(Color(UIColor.secondarySystemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .background(DSBTheme.cardBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard))
                             }
                             .buttonStyle(.plain)
                             .foregroundStyle(.primary)

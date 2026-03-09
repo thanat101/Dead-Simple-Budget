@@ -103,9 +103,9 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .contentShape(Rectangle())
-                    .background(DSBTheme.emerald)
+                    .background { mainUIMetalButton(selected: true).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
                     .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(Color.white.opacity(0.4), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
                 Button {
@@ -119,8 +119,8 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .contentShape(Rectangle())
-                    .background(Color(UIColor.tertiarySystemFill))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .background { mainUIMetalButton(selected: false).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
+                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(Color.primary.opacity(0.12), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
             }
@@ -165,8 +165,8 @@ struct ContentView: View {
         monthlySummaryContent
             .padding(.vertical, 14)
             .padding(.horizontal, 12)
-            .background(Color(UIColor.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background { mainUIMetalCard().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
+            .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(Color.primary.opacity(0.08), lineWidth: 1))
             .onAppear { syncMonthlySummaryFromStore() }
             .onChange(of: payText) { _, new in
                 guard !syncingSummaryFromStore else { return }
@@ -290,7 +290,11 @@ struct ContentView: View {
                     .foregroundStyle(remaining < 0 ? .red : .primary)
             }
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 12)
         .frame(maxWidth: .infinity)
+        .background { mainUIMetalCard().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(Color.primary.opacity(0.08), lineWidth: 1))
         .contentTransition(.numericText())
         .animation(.easeInOut(duration: 0.25), value: store.safeDailySpend)
     }
@@ -419,6 +423,33 @@ struct ContentView: View {
             }
             .onAppear {
                 savingsForm.syncFrom(store)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func mainUIMetalCard() -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)
+                .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
+            RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)
+                .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
+        }
+    }
+
+    @ViewBuilder
+    private func mainUIMetalButton(selected: Bool) -> some View {
+        ZStack {
+            if selected {
+                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
+                    .fill(LinearGradient(colors: [Color(red: 0.2, green: 0.7, blue: 0.45), Color(red: 0.15, green: 0.55, blue: 0.35)], startPoint: .top, endPoint: .bottom))
+                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
+                    .fill(LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .center))
+            } else {
+                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
+                    .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
+                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
+                    .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
             }
         }
     }

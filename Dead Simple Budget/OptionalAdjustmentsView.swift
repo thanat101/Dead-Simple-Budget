@@ -105,8 +105,17 @@ struct AdjustmentRowView: View {
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 12)
-        .background(Color(UIColor.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background { metalRowBackground().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+    }
+}
+
+private func metalRowBackground() -> some View {
+    ZStack {
+        RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)
+            .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
+        RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)
+            .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
     }
 }
 
@@ -181,7 +190,7 @@ struct CurrencyRowView: View {
         .frame(minHeight: 44)
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background(Color(UIColor.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background { metalRowBackground().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(Color.primary.opacity(0.08), lineWidth: 1))
     }
 }
