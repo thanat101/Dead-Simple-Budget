@@ -60,6 +60,7 @@ struct OptionalAdjustmentsView: View {
 }
 
 struct AdjustmentRowView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let title: String
     let value: Double
     let action: () -> Void
@@ -105,17 +106,8 @@ struct AdjustmentRowView: View {
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 12)
-        .background { metalRowBackground().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
-        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(Color.primary.opacity(0.08), lineWidth: 1))
-    }
-}
-
-private func metalRowBackground() -> some View {
-    ZStack {
-        RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)
-            .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
-        RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)
-            .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
+        .background { AdaptiveMetalCard(cornerRadius: DSBTheme.cornerRadiusRow).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
     }
 }
 
@@ -139,6 +131,7 @@ private struct EditButton: View {
 }
 
 struct CurrencyRowView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var currencyLocaleId: String
     var isPremium: Bool = true
     var onRequestPremium: (() -> Void)?
@@ -190,7 +183,7 @@ struct CurrencyRowView: View {
         .frame(minHeight: 44)
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background { metalRowBackground().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
-        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+        .background { AdaptiveMetalCard(cornerRadius: DSBTheme.cornerRadiusRow).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusRow).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
     }
 }

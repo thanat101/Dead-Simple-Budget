@@ -1,0 +1,8 @@
+---
+description: Always consult the user's reference document when answering
+alwaysApply: true
+---
+
+# Reference document
+
+When the user asks a question in this project, read the file **reference.txt** in the project root first. Use its contents for context, preferences, and constraints when answering. If reference.txt is empty or only contains the template, you may skip basing answers on it.

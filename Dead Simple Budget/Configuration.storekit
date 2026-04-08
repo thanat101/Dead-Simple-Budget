@@ -15,8 +15,8 @@
   ],
   "products" : [
     {
-      "displayPrice" : "9.99",
-      "familyShareable" : true,
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
       "internalID" : "DSB001",
       "localizations" : [
         {
@@ -94,7 +94,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "1.99",
+          "displayPrice" : ".99",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "DSB002",

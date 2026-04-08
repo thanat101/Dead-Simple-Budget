@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct IncomeEditView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var form: IncomeFormState
     let onSave: () -> Void
 
@@ -40,7 +41,7 @@ struct IncomeEditView: View {
                                     .fill(DSBTheme.emerald.opacity(0.06))
                             }
                         }
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
                         .onChange(of: amountText) { _, new in
                             if let v = Double(new.filter { $0.isNumber || $0 == "." }) { form.amount = v }
                         }
@@ -72,55 +73,8 @@ struct IncomeEditView: View {
                         .foregroundStyle(isSelected ? .white : .primary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background {
-                            ZStack {
-                                if isSelected {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(red: 0.2, green: 0.7, blue: 0.45),
-                                                    Color(red: 0.15, green: 0.55, blue: 0.35)
-                                                ],
-                                                startPoint: .top,
-                                                endPoint: .bottom
-                                            )
-                                        )
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [.white.opacity(0.5), .white.opacity(0.1), .clear],
-                                                startPoint: .topLeading,
-                                                endPoint: .center
-                                            )
-                                        )
-                                } else {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(white: 0.94),
-                                                    Color(white: 0.82)
-                                                ],
-                                                startPoint: .top,
-                                                endPoint: .bottom
-                                            )
-                                        )
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [.white.opacity(0.6), .clear],
-                                                startPoint: .top,
-                                                endPoint: .center
-                                            )
-                                        )
-                                }
-                            }
-                        }
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(isSelected ? Color.white.opacity(0.4) : Color.primary.opacity(0.12), lineWidth: isSelected ? 1 : 1)
-                        )
+                        .background { AdaptiveMetalButton(selected: isSelected, cornerRadius: 12) }
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DSBTheme.metalStroke(isSelected: isSelected, colorScheme: colorScheme), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
             }
@@ -144,7 +98,7 @@ struct IncomeEditView: View {
                     .fill(DSBTheme.emerald.opacity(0.06))
             }
         }
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
     }
 }
 

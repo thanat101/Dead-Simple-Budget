@@ -24,7 +24,7 @@ struct PaywallView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("Unlock all features")
+                    Text("Unlock widget and all features")
                         .font(.title2)
                         .fontWeight(.bold)
                     Text("Edit take-home pay, bills, savings, and currency to get a more accurate Safe Daily Spend.")

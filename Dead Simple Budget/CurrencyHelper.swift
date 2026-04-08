@@ -14,11 +14,13 @@ enum CurrencyHelper {
     static var currentLocale: Locale = .current
 
     /// Apply a saved locale identifier (call on launch and when user changes currency).
+    /// Defaults to US Dollar when no preference is saved.
     static func applySavedLocale(identifier: String?) {
         if let id = identifier, !id.isEmpty {
             currentLocale = Locale(identifier: id)
         } else {
-            currentLocale = Locale.current
+            // Hard default to US Dollar so the app and widget start in USD.
+            currentLocale = Locale(identifier: "en_US")
         }
     }
 

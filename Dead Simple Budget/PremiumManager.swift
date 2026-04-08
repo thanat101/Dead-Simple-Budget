@@ -41,6 +41,7 @@ final class PremiumManager: ObservableObject {
         errorMessage = nil
         defer { isLoading = false }
 
+        var productsError: Error?
         do {
             let products = try await Product.products(for: ProductIDs.all)
             lifetimeProduct = products.first { $0.id == ProductIDs.lifetime }
@@ -55,18 +56,17 @@ final class PremiumManager: ObservableObject {
                 subscriptionProduct = retryProducts.first { $0.id == ProductIDs.subscription }
             }
             #endif
-
-            var hasEntitlement = false
-            for await result in Transaction.currentEntitlements {
-                guard let transaction = try? result.payloadValue else { continue }
-                if ProductIDs.all.contains(transaction.productID) {
-                    hasEntitlement = true
-                    break
-                }
-            }
-            isPremium = hasEntitlement
         } catch {
-            errorMessage = error.localizedDescription
+            productsError = error
+        }
+
+        // Always evaluate entitlements, even if product fetch failed.
+        let hasEntitlement = await hasAnyPremiumEntitlement()
+        isPremium = hasEntitlement
+
+        // Avoid showing product-fetch errors to users who are already entitled.
+        if let productsError, !hasEntitlement {
+            errorMessage = productsError.localizedDescription
         }
     }
 
@@ -80,8 +80,17 @@ final class PremiumManager: ObservableObject {
             switch result {
             case .success(let verification):
                 let transaction = try checkVerified(verification)
+                let purchasedID = transaction.productID
                 await transaction.finish()
+                if ProductIDs.all.contains(purchasedID) {
+                    isPremium = true
+                }
                 await refresh()
+                // Simulator / sandbox often lag before currentEntitlements lists the new purchase;
+                // we already have a verified transaction for our product.
+                if !isPremium, ProductIDs.all.contains(purchasedID) {
+                    isPremium = true
+                }
                 return true
             case .userCancelled:
                 return false
@@ -112,10 +121,16 @@ final class PremiumManager: ObservableObject {
 
     private func listenForTransactions() async {
         for await result in Transaction.updates {
-            guard let transaction = try? result.payloadValue else { continue }
-            if ProductIDs.all.contains(transaction.productID) {
+            switch result {
+            case .verified(let transaction):
+                guard ProductIDs.all.contains(transaction.productID) else { continue }
                 await transaction.finish()
                 await refresh()
+                if !isPremium {
+                    isPremium = true
+                }
+            case .unverified:
+                continue
             }
         }
     }
@@ -127,5 +142,15 @@ final class PremiumManager: ObservableObject {
         case .verified(let value):
             return value
         }
+    }
+
+    private func hasAnyPremiumEntitlement() async -> Bool {
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result,
+               ProductIDs.all.contains(transaction.productID) {
+                return true
+            }
+        }
+        return false
     }
 }

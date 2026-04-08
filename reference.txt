@@ -1,0 +1,88 @@
+# Reference for AI
+
+Here’s a complete Dead Simple Budget app summary and UI design plan so you can begin coding. I’ve broken it into sections for clarity.
+App Concept Summary
+Name: Dead Simple Budget
+Goal: Provide users a single, actionable daily spend amount with optional savings and optional itemized bills, minimizing friction.
+Core Principles:
+
+Simplicity first: Users should see their Safe Daily Spend immediately.
+Optional precision: Bills and savings are optional adjustments.
+Adaptable monthly bills: Default average bills are used unless updated.
+Main Features
+Monthly Income Input: User enters their total monthly income.
+Safe Daily Spend: Automatically calculated as:
+Safe Daily Spend = (Income − Bills − Optional Savings) ÷ Days in Month
+Optional Monthly Bills: Users can skip or itemize bills. Default estimates used if skipped.
+Optional Savings Goal: Pre-set percentage or custom amount, adjustable or off.
+Daily Update: Safe Daily Spend recalculates if bills or savings change.
+Simple Dashboard: Shows only what the user needs to act on: daily spend, savings progress, and minimal navigation.
+Screen Flow & UI Overview
+1. Onboarding / Income Entry
+Layout: Full-screen, clean UI
+Elements:
+App logo or icon at top
+Headline: “Enter your monthly income”
+Input field for income
+“Next” button (primary action)
+Behavior: User enters income → moves to main dashboard
+2. Main Dashboard (Core Screen)
+Layout (Single Screen, dead simple):
+-------------------------------------------------
+| Header: App name or icon                      |
+-------------------------------------------------
+| Safe Daily Spend (big, centered, prominent)  |
+| $66 / day                                     |
+-------------------------------------------------
+| Optional Adjustments (collapsed by default)  |
+| 1. Bills: $3,000 (edit)                      |
+| 2. Savings: $500 (edit)                      |
+|    -> Toggle on/off                           |
+-------------------------------------------------
+| Quick Actions / Info                          |
+| - Update bills                                |
+| - Update income                               |
+-------------------------------------------------
+UI Details:
+Safe Daily Spend: Largest element on screen, centrally aligned.
+Optional Bills & Savings: Collapsible panels to keep interface minimal.
+Buttons: Flat, single-color, consistent with app palette (Emerald, Charcoal, White).
+Feedback: When bills or savings updated, Safe Daily Spend animates to new value.
+3. Optional Bill Entry Screen
+Layout: Modal or new screen
+Elements:
+Add bill name, amount, frequency
+Option to skip → uses default average bills
+Save/Cancel buttons
+Behavior: On save, dashboard updates Safe Daily Spend.
+4. Optional Savings Screen
+Layout: Modal or inline panel
+Elements:
+Toggle: “Enable savings”
+Input: Amount or percentage of income
+Suggested default: 10%
+Save/Cancel buttons
+Behavior: Updates Safe Daily Spend immediately.
+5. Dark Mode / Glass Icon Integration
+Ensure the app icon adapts to system theme.
+UI uses consistent contrast for readability: dark backgrounds with bright text and highlight colors.
+Data Flow / Calculations
+Input: Income
+Optional Inputs: Bills, savings
+Compute Safe Daily Spend:
+dailySpend = (income - totalBills - savingsGoal) / daysInMonth
+Display on dashboard: Rounded to nearest dollar or cent.
+Update dynamically: Changing any input recalculates immediately.
+Design Notes
+Keep all fonts and text minimalistic and readable.
+Use flat design; no gradients in core UI except subtle highlights.
+Primary colors: Emerald Green, Dark Charcoal, White.
+Animations should be subtle (number transitions, panel expand/collapse).
+UI Components Summary
+Component	Description
+Header	App name/logo, optional menu icon
+Safe Daily Spend	Large central text, primary action focus
+Optional Panels	Bills & Savings (collapsed by default)
+Buttons	Flat, primary color for actions, secondary for secondary options
+Modal Screens	For editing bills or savings details
+Quick Actions	Update income, reset defaults

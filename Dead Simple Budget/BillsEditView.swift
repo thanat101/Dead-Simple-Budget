@@ -8,29 +8,13 @@
 import SwiftUI
 
 struct BillsEditView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var form: BillsFormState
     let defaultBillsAmount: Double
     let onUseDefault: () -> Void
     let onSave: () -> Void
 
     @State private var lumpSumText = ""
-
-    @ViewBuilder
-    private func metalBackground(selected: Bool) -> some View {
-        ZStack {
-            if selected {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(LinearGradient(colors: [Color(red: 0.2, green: 0.7, blue: 0.45), Color(red: 0.15, green: 0.55, blue: 0.35)], startPoint: .top, endPoint: .bottom))
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .center))
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
-            }
-        }
-    }
 
     var body: some View {
         ScrollView {
@@ -60,8 +44,8 @@ struct BillsEditView: View {
                 .keyboardType(.decimalPad)
                 .padding(.vertical, 6)
                 .padding(.horizontal, 8)
-                .background { metalBackground(selected: false).clipShape(RoundedRectangle(cornerRadius: 8)) }
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+                .background { AdaptiveMetalCard(cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
                 .onChange(of: lumpSumText) { _, new in
                     if let v = Double(new.filter { $0.isNumber || $0 == "." }) { form.lumpSum = v }
                 }
@@ -83,8 +67,8 @@ struct BillsEditView: View {
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 10)
-            .background { metalBackground(selected: true).clipShape(RoundedRectangle(cornerRadius: 8)) }
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.4), lineWidth: 1))
+            .background { AdaptiveMetalButton(selected: true, cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: true, colorScheme: colorScheme), lineWidth: 1))
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)
@@ -102,8 +86,8 @@ struct BillsEditView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.vertical, 6)
                         .padding(.horizontal, 10)
-                        .background { metalBackground(selected: true).clipShape(RoundedRectangle(cornerRadius: 8)) }
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.4), lineWidth: 1))
+                        .background { AdaptiveMetalButton(selected: true, cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: true, colorScheme: colorScheme), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.white)
@@ -130,8 +114,8 @@ struct BillsEditView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 6)
                     .padding(.horizontal, 10)
-                    .background { metalBackground(selected: true).clipShape(RoundedRectangle(cornerRadius: 8)) }
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.4), lineWidth: 1))
+                    .background { AdaptiveMetalButton(selected: true, cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: true, colorScheme: colorScheme), lineWidth: 1))
             }
             .buttonStyle(.plain)
             .foregroundStyle(.white)
@@ -148,8 +132,8 @@ struct BillsEditView: View {
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
-                .background { metalBackground(selected: false).clipShape(RoundedRectangle(cornerRadius: 8)) }
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+                .background { AdaptiveMetalCard(cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
 
                 Button("Switch to lump sum", role: .destructive) {
                     form.switchToLumpSum()
@@ -162,6 +146,7 @@ struct BillsEditView: View {
 }
 
 struct BillRowView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var bill: BillItem
     @State private var amountText = ""
 
@@ -171,43 +156,22 @@ struct BillRowView: View {
                 .font(.caption2)
                 .padding(.vertical, 5)
                 .padding(.horizontal, 6)
-                .background {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(LinearGradient(colors: [Color(white: 0.96), Color(white: 0.88)], startPoint: .top, endPoint: .bottom))
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(LinearGradient(colors: [.white.opacity(0.5), .clear], startPoint: .top, endPoint: .center))
-                    }
-                }
-                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+                .background { AdaptiveMetalField(cornerRadius: 6).clipShape(RoundedRectangle(cornerRadius: 6)) }
+                .overlay(RoundedRectangle(cornerRadius: 6).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
             HStack(spacing: 4) {
                 TextField("Amount", text: $amountText)
                     .font(.caption2)
                     .keyboardType(.decimalPad)
                     .padding(.vertical, 5)
                     .padding(.horizontal, 6)
-                    .background {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(LinearGradient(colors: [Color(white: 0.96), Color(white: 0.88)], startPoint: .top, endPoint: .bottom))
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(LinearGradient(colors: [.white.opacity(0.5), .clear], startPoint: .top, endPoint: .center))
-                        }
-                    }
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+                    .background { AdaptiveMetalField(cornerRadius: 6).clipShape(RoundedRectangle(cornerRadius: 6)) }
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
                 frequencyMenu
             }
         }
         .padding(6)
-        .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
-            }
-        }
-        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+        .background { AdaptiveMetalCard(cornerRadius: 8).clipShape(RoundedRectangle(cornerRadius: 8)) }
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
         .onAppear { amountText = bill.amount > 0 ? String(Int(bill.amount)) : "" }
         .onChange(of: bill.amount) { _, new in
             let s = new > 0 ? String(Int(new)) : ""
@@ -238,15 +202,8 @@ struct BillRowView: View {
             .padding(.vertical, 5)
             .padding(.horizontal, 6)
             .frame(maxWidth: .infinity)
-            .background {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(LinearGradient(colors: [Color(white: 0.96), Color(white: 0.88)], startPoint: .top, endPoint: .bottom))
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(LinearGradient(colors: [.white.opacity(0.5), .clear], startPoint: .top, endPoint: .center))
-                }
-            }
-            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+            .background { AdaptiveMetalField(cornerRadius: 6).clipShape(RoundedRectangle(cornerRadius: 6)) }
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
         }
         .tint(DSBTheme.emerald)
     }

@@ -6,6 +6,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var store = BudgetStore()
     @StateObject private var premiumManager = PremiumManager()
     @StateObject private var incomeForm = IncomeFormState()
@@ -60,7 +61,28 @@ struct ContentView: View {
             PaywallView(manager: premiumManager, isPresented: $showPaywall)
         }
         .onAppear {
-            checkUpgradePromptAfterLaunch()
+            // Wait for StoreKit entitlements; onAppear runs before PremiumManager’s async refresh() finishes,
+            // so checking isPremium here can wrongly show the upgrade prompt to subscribers.
+            Task {
+                await premiumManager.refresh()
+                checkUpgradePromptAfterLaunch()
+            }
+            pushWidgetData()
+            handleNotifications()
+        }
+        .onChange(of: store.safeDailySpend) { _, _ in
+            pushWidgetData()
+        }
+        .onChange(of: store.remainingThisMonth) { _, _ in
+            pushWidgetData()
+        }
+        .onChange(of: premiumManager.isPremium) { _, isPremium in
+            if isPremium { showUpgradePrompt = false }
+            pushWidgetData()
+            handleNotifications()
+        }
+        .onChange(of: currencyLocaleId) { _, _ in
+            pushWidgetData()
         }
         .sheet(isPresented: $showUpgradePrompt) {
             upgradePromptSheet
@@ -84,7 +106,7 @@ struct ContentView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
                 .padding(.top, 8)
-            Text("You've used your \(upgradePromptLaunchCount) free app opens. Upgrade to unlock unlimited use.")
+            Text("You've used your \(upgradePromptLaunchCount) free app opens. Upgrade to unlock the widget and all features.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -103,9 +125,9 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .contentShape(Rectangle())
-                    .background { mainUIMetalButton(selected: true).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
+                    .background { AdaptiveMetalButton(selected: true, cornerRadius: DSBTheme.cornerRadiusButton).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
                     .foregroundStyle(.white)
-                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(Color.white.opacity(0.4), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(DSBTheme.metalStroke(isSelected: true, colorScheme: colorScheme), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
                 Button {
@@ -119,8 +141,8 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 56)
                     .contentShape(Rectangle())
-                    .background { mainUIMetalButton(selected: false).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
-                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(Color.primary.opacity(0.12), lineWidth: 1))
+                    .background { AdaptiveMetalButton(selected: false, cornerRadius: DSBTheme.cornerRadiusButton).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)) }
+                    .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
             }
@@ -128,6 +150,17 @@ struct ContentView: View {
             .padding(.bottom, 24)
         }
         .presentationDetents([.medium])
+    }
+
+    private func handleNotifications() {
+        if premiumManager.isPremium {
+            BudgetNotificationManager.requestAndScheduleWeeklyIfNeeded(
+                safeDailySpend: store.safeDailySpend,
+                remainingThisMonth: store.remainingThisMonth
+            )
+        } else {
+            BudgetNotificationManager.cancelWeekly()
+        }
     }
 
     private static let launchCountKey = "dsb.freeLaunchCount"
@@ -165,8 +198,8 @@ struct ContentView: View {
         monthlySummaryContent
             .padding(.vertical, 14)
             .padding(.horizontal, 12)
-            .background { mainUIMetalCard().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
-            .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+            .background { AdaptiveMetalCard(cornerRadius: DSBTheme.cornerRadiusCard).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
+            .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
             .onAppear { syncMonthlySummaryFromStore() }
             .onChange(of: payText) { _, new in
                 guard !syncingSummaryFromStore else { return }
@@ -293,8 +326,8 @@ struct ContentView: View {
         .padding(.vertical, 16)
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity)
-        .background { mainUIMetalCard().clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
-        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(Color.primary.opacity(0.08), lineWidth: 1))
+        .background { AdaptiveMetalCard(cornerRadius: DSBTheme.cornerRadiusCard).clipShape(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)) }
+        .overlay(RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard).stroke(DSBTheme.metalStroke(isSelected: false, colorScheme: colorScheme), lineWidth: 1))
         .contentTransition(.numericText())
         .animation(.easeInOut(duration: 0.25), value: store.safeDailySpend)
     }
@@ -427,32 +460,19 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
-    private func mainUIMetalCard() -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)
-                .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
-            RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusCard)
-                .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
-        }
+    private func pushWidgetData() {
+        let monthly = store.monthlySpendable.isFinite ? store.monthlySpendable : 0
+        let daily = store.safeDailySpend.isFinite ? store.safeDailySpend : 0
+        let remaining = store.remainingThisMonth.isFinite ? store.remainingThisMonth : 0
+        WidgetSharedData.update(
+            monthlySpendable: monthly,
+            formattedSafeDaily: CurrencyHelper.format(daily),
+            formattedRemaining: CurrencyHelper.format(remaining),
+            currencyLocaleIdentifier: currencyLocaleId,
+            isPremium: premiumManager.isPremium
+        )
     }
 
-    @ViewBuilder
-    private func mainUIMetalButton(selected: Bool) -> some View {
-        ZStack {
-            if selected {
-                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
-                    .fill(LinearGradient(colors: [Color(red: 0.2, green: 0.7, blue: 0.45), Color(red: 0.15, green: 0.55, blue: 0.35)], startPoint: .top, endPoint: .bottom))
-                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
-                    .fill(LinearGradient(colors: [.white.opacity(0.5), .white.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .center))
-            } else {
-                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
-                    .fill(LinearGradient(colors: [Color(white: 0.94), Color(white: 0.82)], startPoint: .top, endPoint: .bottom))
-                RoundedRectangle(cornerRadius: DSBTheme.cornerRadiusButton)
-                    .fill(LinearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .center))
-            }
-        }
-    }
 }
 
 #Preview {
